@@ -1,5 +1,5 @@
+<pre> ```text
 ugfm_calc_v3_71.py print:
-
           node  model_mass_MeV  pdg_mass_MeV  delta_%
   proton (uud)          938.27       938.272     0.00
  neutron (udd)          939.58       939.565     0.00
@@ -23,7 +23,6 @@ node_bbb (bbb)        14789.34           NaN      NaN
 
 
 ugfm_waves_4D_6D.py print:
-
 === Harmonics on S^4 ===
     R (m)   ℓ  degeneracy   ω_ℓ (rad/s)  E_ℓ (J)      Role
 0     0.0   0           1  0.000000e+00      0.0    photon
@@ -131,3 +130,4 @@ ugfm_waves_4D_6D.py print:
 30    0.0   8        2079  3.057295e+23      0.0  unstable
 31    0.0   9        3289  3.365162e+23      0.0  unstable
 32    0.0  10        5005  3.671693e+23      0.0  unstable
+</pre>
