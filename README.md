@@ -1,4 +1,4 @@
-<pre> ```text
+<pre>
 ugfm_calc_v3_71.py print:
           node  model_mass_MeV  pdg_mass_MeV  delta_%
   proton (uud)          938.27       938.272     0.00
