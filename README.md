@@ -23,8 +23,6 @@ node_bbb (bbb)        14789.34           NaN      NaN
 
 ugfm_waves_4D_6Dfix.py print:
 === Harmonics on S^4 ===
-           R (m)   ℓ  degeneracy   ω_ℓ (rad/s)  E_ℓ (J)      Role
-=== Harmonics on S^4 ===
          R_m   l  degeneracy omega_rad_s       E_J      Role
 0   1.00e-15   0           1    0.00e+00  0.00e+00    photon
 1   1.00e-15   1           5    6.00e+23  6.32e-11   nucleus
