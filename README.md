@@ -21,7 +21,6 @@ node_ccc (ccc)         4816.64           NaN      NaN
 node_bbb (bbb)        14789.34           NaN      NaN
 
 
-
 ugfm_waves_4D_6Dfix.py print:
 === Harmonics on S^4 ===
            R (m)   ℓ  degeneracy   ω_ℓ (rad/s)  E_ℓ (J)      Role
