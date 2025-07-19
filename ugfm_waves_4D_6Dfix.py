@@ -1,7 +1,6 @@
 """
 UGFM harmonic scan on n‑sphere (n = 4, 5, 6).
 v.3.71
-Fixed
 Changes requested by the user:
   1. Print *one* table per dimension that already contains both photon and baryon‑candidate rows.
   2. Round every numeric column to two decimals.
@@ -20,75 +19,61 @@ Column meaning (theory logic):
   Role          – Qualitative UGFM assignment (see above).
 
 """
+"""
+v3.71 — radii & energies fixed
+"""
 
-import math
-import numpy as np
-import pandas as pd
-from typing import List
+import math, numpy as np, pandas as pd
+ħ = 1.054_571_817e-34     # J·s
+c = 2.997_924_58e8        # m/s
 
-ħ = 1.054_571_817e-34  # J·s
-c = 2.997_924_58e8     # m/s
+R_LIST = [1.0e-15, 5.0e-15, 1.0e-14]   # metres
+ℓ_max   = 10
+m_particle = 0.0                       # kg (set 0 → photon‑like)
 
-# Radii to scan (metres)
-R_LIST: List[float] = [1.0e-15, 5.0e-15, 1.0e-14]
+def degeneracy(n, ℓ):
+    return (2*ℓ + n - 1) * math.factorial(ℓ + n - 2) // (
+           math.factorial(ℓ) * math.factorial(n - 1))
 
-ℓ_max: int = 10        # maximum harmonic index to consider
-m_particle: float = 0.0  # scalar mass (kg) – set to zero for pure KG photon‑like modes
+def laplace_eval(n, ℓ, R):
+    return ℓ * (ℓ + n - 1) / R**2
 
-def degeneracy_nsphere(n: int, ℓ: int) -> int:
-    """Return Laplacian eigenfunction degeneracy on S^n (scalar harmonics).
-    Formula: g_n(ℓ) = (2ℓ + n − 1) * (ℓ + n − 2)! / (ℓ! * (n − 1)!)."""
-    numerator = (2 * ℓ + n - 1)
-    denom_factorial = math.factorial(n - 1) * math.factorial(ℓ)
-    return (numerator * math.factorial(ℓ + n - 2)) // denom_factorial
+def ω_klein(n, ℓ, R, m=0.0):
+    k = math.sqrt(laplace_eval(n, ℓ, R))
+    return math.sqrt((c*k)**2 + (m*c**2/ħ)**2)
 
-def laplacian_eigenvalue(n: int, ℓ: int, R: float) -> float:
-    """Eigenvalue of minus‑Laplacian on S^n: λ = ℓ(ℓ + n − 1) / R²"""
-    return ℓ * (ℓ + n - 1) / (R ** 2)
-
-def klein_gordon_frequency(n: int, ℓ: int, R: float, m: float = 0.0) -> float:
-    """Relativistic frequency √[(ck)² + (mc²/ħ)²] with k = √λ."""
-    λ = laplacian_eigenvalue(n, ℓ, R)
-    k = math.sqrt(λ)
-    ω2 = (c * k) ** 2 + (m * c ** 2 / ħ) ** 2
-    return math.sqrt(ω2)
-
-def energy_quantum(ω: float) -> float:
-    return ħ * ω
-
-def classify_role(ℓ: int, R: float) -> str:
-    """Assign heuristic UGFM role label."""
-    if ℓ == 0:
-        return "photon"
-    # 1 fm ≃ 1.0e‑15 m; allow 5 % tolerance
-    if ℓ in (1, 2, 3) and math.isclose(R, 1.0e-15, rel_tol=0.05):
+def classify(ℓ, R):
+    if ℓ == 0: return "photon"
+    if ℓ in (1,2,3) and math.isclose(R, 1e-15, rel_tol=0.05):
         return "nucleus"
     return "unstable"
 
-def build_table_for_dimension(n: int) -> pd.DataFrame:
-    """Compute harmonics for given n and return rounded DataFrame with role column."""
+def table_Sn(n):
     rows = []
     for R in R_LIST:
         for ℓ in range(ℓ_max + 1):
-            ω = klein_gordon_frequency(n, ℓ, R, m_particle)
-            rows.append({
-                "R (m)": R,
-                "ℓ": ℓ,
-                "degeneracy": degeneracy_nsphere(n, ℓ),
-                "ω_ℓ (rad/s)": ω,
-                "E_ℓ (J)": energy_quantum(ω),
-                "Role": classify_role(ℓ, R)
-            })
+            ω  = ω_klein(n, ℓ, R, m_particle)
+            E  = ħ * ω
+            rows.append(dict(
+                R_m = R,
+                l   = ℓ,
+                degeneracy = degeneracy(n, ℓ),
+                omega_rad_s = ω,
+                E_J = E,
+                Role = classify(ℓ, R)
+            ))
     df = pd.DataFrame(rows)
-    num_cols = ["ω_ℓ (rad/s)", "E_ℓ (J)"]
-    df[num_cols] = df[num_cols].round(2)
+
+    # форматируем число радиуса и энергии в научном виде
+    df["R_m"]  = df["R_m" ].apply(lambda x: f"{x:.2e}")
+    df["E_J"]  = df["E_J" ].apply(lambda x: f"{x:.2e}")
+    df["omega_rad_s"] = df["omega_rad_s"].apply(lambda x: f"{x:.2e}")
     return df
 
-def print_tables():
-    for n in (4, 5, 6):
+def main():
+    for n in (4,5,6):
         print(f"\n=== Harmonics on S^{n} ===")
-        df = build_table_for_dimension(n)
-        print(df)
+        print(table_Sn(n))
 
 if __name__ == "__main__":
-    print_tables()
+    main()
